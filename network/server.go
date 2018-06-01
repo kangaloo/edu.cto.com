@@ -22,18 +22,16 @@ func main() {
 		}
 
 		go Conn(conn)
-
 	}
-
 }
 
 // todo 结构体为参数时，什么情况传指针，什么情况传值
 func Conn(c net.Conn) ([]byte, error) {
 	buf := make([]byte, 1024)
-	_, err := c.Read(buf)
+	n, err := c.Read(buf)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(buf)
+	fmt.Println(buf[:n])
 	return buf, nil
 }
