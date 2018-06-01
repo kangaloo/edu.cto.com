@@ -26,12 +26,13 @@ func main() {
 }
 
 // todo 结构体为参数时，什么情况传指针，什么情况传值
-func Conn(c net.Conn) ([]byte, error) {
+func Conn(c net.Conn) {
 	buf := make([]byte, 1024)
 	n, err := c.Read(buf)
+
 	if err != nil {
-		return nil, err
+		log.Fatalln(err)
 	}
+
 	fmt.Println(buf[:n])
-	return buf, nil
 }
