@@ -21,9 +21,11 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 	buf := make([]byte, 1024)
-	header := bytes.NewBuffer(make([]byte, 0))
 
 	for {
+
+		// 需要每次生成新的 header，否则数据不正确
+		header := bytes.NewBuffer(make([]byte, 0))
 
 		fmt.Printf(">> ")
 		input, err := reader.ReadBytes('\n')
@@ -49,16 +51,24 @@ func main() {
 			return
 		}
 
-		conn.Write(header.Bytes())
-		conn.Write(input[:len(input)-1])
+		fmt.Println("header: ", header.Bytes(), " input: ", input)
+
+		content := append(header.Bytes(), input[:len(input)-1]...)
+		fmt.Println("content: ", content)
+
+		_, err = conn.Write(content)
+		if err != nil {
+			log.Println(err)
+		}
 
 		_, err = conn.Read(buf)
+
 		if err != nil {
 			log.Println(err)
 			return
 		}
 
+		//fmt.Println("header: ", length, "content: ", input)
 		fmt.Println(string(buf))
-
 	}
 }

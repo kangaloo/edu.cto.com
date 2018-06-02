@@ -38,9 +38,10 @@ func Conn(c net.Conn) {
 	header := make([]byte, 8)
 	all := make([]byte, 0, 1024)
 	buf := make([]byte, 1024)
+	var length int64
+	var n int
 
 	for {
-
 		// 读完最后的数据后，会阻塞
 		_, err := c.Read(header)
 
@@ -54,8 +55,11 @@ func Conn(c net.Conn) {
 			return
 		}
 
-		var length int64
+		fmt.Println("header: ", header) // test
+
 		err = binary.Read(bytes.NewBuffer(header), binary.BigEndian, &length)
+
+		fmt.Println("length: ", length) // test
 
 		if err != nil {
 			log.Println(err)
@@ -64,13 +68,12 @@ func Conn(c net.Conn) {
 		l := int(length)
 
 		for {
-			n := 0
 			var err error
 
-			fmt.Println(l)
+			fmt.Println("l: ", l)
 
 			if l < len(buf) {
-				n, err = c.Read(buf[:l+1])
+				n, err = c.Read(buf[:l])
 			} else {
 				n, err = c.Read(buf)
 			}
@@ -90,14 +93,19 @@ func Conn(c net.Conn) {
 				log.Printf("%s disconnect .", c.RemoteAddr())
 				break
 			}
-			fmt.Println(buf[:n])
+
+			fmt.Println("content: ", buf[:n])
 
 			// todo 写文件
 			all = append(all, buf[:n]...)
 			l -= n
 
-			if l == 0 {
+			fmt.Println("new l: ", l)
+
+			if l <= 0 {
 				c.Write([]byte("ok"))
+				fmt.Println("read command finished .")
+				fmt.Println()
 				break
 			}
 		}
