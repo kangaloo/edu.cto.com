@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"log"
 	"net"
@@ -18,6 +20,8 @@ func main() {
 	}
 
 	reader := bufio.NewReader(os.Stdin)
+	buf := make([]byte, 1024)
+	header := bytes.NewBuffer(make([]byte, 0))
 
 	for {
 
@@ -37,6 +41,24 @@ func main() {
 			os.Exit(0)
 		}
 
+		length := int64(len(input) - 1)
+		err = binary.Write(header, binary.BigEndian, length)
+
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		conn.Write(header.Bytes())
 		conn.Write(input[:len(input)-1])
+
+		_, err = conn.Read(buf)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		fmt.Println(string(buf))
+
 	}
 }
