@@ -21,6 +21,7 @@ func main() {
 		if err != nil {
 			log.Fatalln(err)
 		}
+		log.Printf("%s connected .", conn.RemoteAddr())
 
 		go Conn(conn)
 	}
@@ -30,6 +31,7 @@ func main() {
 func Conn(c net.Conn) {
 	defer c.Close()
 
+	all := make([]byte, 0, 1024)
 	buf := make([]byte, 2)
 
 	for {
@@ -48,8 +50,11 @@ func Conn(c net.Conn) {
 
 			// client 执行 conn.Close() 正常关闭连接时，此处的err为EOF
 			log.Println(err)
+			log.Printf("%s disconnect .", c.RemoteAddr())
 			break
 		}
 		fmt.Println(buf[:n])
+		all = append(all, buf[:n]...)
 	}
+	fmt.Println(all)
 }
