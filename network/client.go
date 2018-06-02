@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"net"
@@ -16,22 +17,26 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	input := ""
+	reader := bufio.NewReader(os.Stdin)
 
 	for {
-		_, err = fmt.Scanf("%v", &input)
+
+		fmt.Printf(">> ")
+		input, err := reader.ReadBytes('\n')
+
+		// 目前认为，输入文件为 os.Stdin 所以读不到 io.EOF
 		if err != nil {
-			log.Fatalln(err)
+			return
 		}
 
-		if input == "exit" {
-			os.Exit(0)
-		}
-
-		if input == "" {
+		if len(input) == 0 {
 			continue
 		}
 
-		conn.Write([]byte(input))
+		if string(input) == "exit\n" {
+			os.Exit(0)
+		}
+
+		conn.Write(input[:len(input)-1])
 	}
 }
