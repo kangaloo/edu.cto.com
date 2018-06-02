@@ -28,20 +28,28 @@ func main() {
 
 // todo 结构体为参数时，什么情况传指针，什么情况传值
 func Conn(c net.Conn) {
-	buf := make([]byte, 1024)
+	defer c.Close()
+
+	buf := make([]byte, 2)
 
 	for {
+
+		// 读完最后的数据后，会阻塞
 		n, err := c.Read(buf)
 
 		if err != nil {
+
+			// 从socket读取完所有数据的当次，或者下一次会得到 io.EOF
+			// 目前没有出现在当次，又因为当次读取完成后，下一次读取会因为没有数据而阻塞
+			// 后续从 client 发送来的数据会继续处理，不会引发 io.EOF
 			if err != io.EOF {
 				log.Fatalln(err)
 			}
+
+			// client 执行 conn.Close() 正常关闭连接时，此处的err为EOF
 			log.Println(err)
 			break
 		}
-
 		fmt.Println(buf[:n])
 	}
-	c.Close()
 }

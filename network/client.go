@@ -21,16 +21,17 @@ func main() {
 	for {
 		_, err = fmt.Scanf("%v", &input)
 		if err != nil {
-			conn.Close()
 			log.Fatalln(err)
 		}
 
 		if input == "exit" {
-			conn.Close()
 			os.Exit(0)
+		}
+
+		if input == "" {
+			continue
 		}
 
 		conn.Write([]byte(input))
 	}
-
 }
