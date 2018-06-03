@@ -7,14 +7,12 @@ import (
 )
 
 type Packet struct {
-	len   int64
-	isCmd bool
-	md5   string
-	data  []byte
+	Header
+	data []byte
 }
 
 // 生成新的 Packet
-func New(cmd bool, b ...byte) *Packet {
+func New(iscmd bool, b ...byte) *Packet {
 
 	length := len(b)
 
@@ -23,10 +21,8 @@ func New(cmd bool, b ...byte) *Packet {
 }
 
 // 将 Packet 类型转换成 []byte
-// len 字段长度为 8 字节
 func (p *Packet) Bytes() []byte {
-
-	return nil
+	return append(p.Header.Bytes(), p.data...)
 }
 
 // 从连接里读取数据，并生成 Packet
