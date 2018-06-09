@@ -18,3 +18,5 @@ manager
 *.conf
 
 .DS_Store
+
+picture/
